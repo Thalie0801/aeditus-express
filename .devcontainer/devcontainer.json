@@ -1,0 +1,11 @@
+{
+  "name": "aeditus-express",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "postCreateCommand": "corepack enable && corepack prepare pnpm@9 --activate && pnpm -r i",
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-azuretools.vscode-docker", "EditorConfig.EditorConfig"]
+    }
+  }
+}
