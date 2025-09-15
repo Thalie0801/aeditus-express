@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: app  # Next.js lives in ./app
+        working-directory: app        # Next.js lives under ./app
     steps:
       - uses: actions/checkout@v4
 
@@ -21,7 +21,7 @@ jobs:
           cache: "npm"
           cache-dependency-path: app/package-lock.json
 
-      - name: Install
+      - name: Install (CI)
         run: npm ci
 
       - name: Build
