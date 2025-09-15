@@ -11,27 +11,28 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: app        # Next.js lives under ./app
+        working-directory: app
+    env:
+      # pour Next (exposition client + build SSG)
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      # compat si certains bouts de code lisent ces noms-là
+      supabaseUrl: ${{ secrets.SUPABASE_URL }}
+      supabaseKey: ${{ secrets.SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: '20'
+          cache: npm
           cache-dependency-path: app/package-lock.json
-
-      - name: Install (CI)
-        run: npm ci
-
-      - name: Build
-        run: npm run build --if-present
-        env:
-          supabaseUrl: ${{ secrets.SUPABASE_URL }}
-          supabaseKey: ${{ secrets.SUPABASE_KEY }}
-
-      - name: Lint
-        run: npm run lint --if-present
-
-      - name: Typecheck
-        run: npm run typecheck --if-present
+      - run: npm ci
+      - name: Debug env (mask-safe)
+        run: |
+          node -e "console.log('NEXT_PUBLIC_SUPABASE_URL set?', !!process.env.NEXT_PUBLIC_SUPABASE_URL)"
+          node -e "console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY set?', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)"
+          node -e "console.log('supabaseUrl set?', !!process.env.supabaseUrl)"
+          node -e "console.log('supabaseKey set?', !!process.env.supabaseKey)"
+      - run: npm run build --if-present
+      - run: npm run lint --if-present
+      - run: npm run typecheck --if-present
