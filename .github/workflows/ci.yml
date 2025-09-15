@@ -32,5 +32,3 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck --if-present
-
-    
