@@ -9,9 +9,10 @@ on:
 jobs:
   build:
     env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-      # (compat éventuelle)
       supabaseUrl: ${{ secrets.SUPABASE_URL }}
       supabaseKey: ${{ secrets.SUPABASE_ANON_KEY }}
     runs-on: ubuntu-latest
