@@ -1,0 +1,23 @@
+name: PNPM Run (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      cmd:
+        description: "pnpm command to run (e.g. -r build)"
+        required: true
+        default: "-r build"
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Install
+        run: pnpm -r i
+      - name: Run pnpm ${{ inputs.cmd }}
+        run: pnpm ${{ inputs.cmd }}
