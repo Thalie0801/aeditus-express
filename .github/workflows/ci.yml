@@ -11,15 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: app   # le Next.js est sous ./app
+        working-directory: app
     env:
-      # 1) disponibles pour toutes les étapes (SSG/ISR)
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-      # 2) alias camelCase si ton code les lit
       supabaseUrl: ${{ secrets.SUPABASE_URL }}
       supabaseKey: ${{ secrets.SUPABASE_ANON_KEY }}
-      # 3) fallback en UPPER_CASE si tu veux aussi les lire côté serveur
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
@@ -32,19 +29,17 @@ jobs:
           cache: "npm"
           cache-dependency-path: app/package-lock.json
 
-      # (Option robuste) Écrire un .env.local consommé par Next au build
       - name: Create .env.local for build
         run: |
-          cat > .env.local <<'EOF'
-          NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-          # aliases (si ton code les lit)
-          supabaseUrl=${NEXT_PUBLIC_SUPABASE_URL}
-          supabaseKey=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+          cat > .env.local <<EOF
+          NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+          supabaseUrl=$supabaseUrl
+          supabaseKey=$supabaseKey
+          SUPABASE_URL=$SUPABASE_URL
+          SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
           EOF
-          ls -la
 
-      # Debug non-verbeux (ne montre pas les valeurs)
       - name: Debug env (mask-safe)
         run: |
           node -e "console.log('URL set?', !!process.env.NEXT_PUBLIC_SUPABASE_URL)"
