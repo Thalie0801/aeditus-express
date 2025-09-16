@@ -34,10 +34,8 @@ jobs:
           cat > .env.local <<EOF
           NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
           NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
-          supabaseUrl=$supabaseUrl
-          supabaseKey=$supabaseKey
-          SUPABASE_URL=$SUPABASE_URL
-          SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+          supabaseUrl=$NEXT_PUBLIC_SUPABASE_URL
+          supabaseKey=$NEXT_PUBLIC_SUPABASE_ANON_KEY
           EOF
 
       - name: Debug env (mask-safe)
