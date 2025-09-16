@@ -11,28 +11,53 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: app
+        working-directory: app   # le Next.js est sous ./app
     env:
-      # pour Next (exposition client + build SSG)
+      # 1) disponibles pour toutes les étapes (SSG/ISR)
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-      # compat si certains bouts de code lisent ces noms-là
+      # 2) alias camelCase si ton code les lit
       supabaseUrl: ${{ secrets.SUPABASE_URL }}
       supabaseKey: ${{ secrets.SUPABASE_ANON_KEY }}
+      # 3) fallback en UPPER_CASE si tu veux aussi les lire côté serveur
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: npm
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: app/package-lock.json
-      - run: npm ci
+
+      # (Option robuste) Écrire un .env.local consommé par Next au build
+      - name: Create .env.local for build
+        run: |
+          cat > .env.local <<'EOF'
+          NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+          # aliases (si ton code les lit)
+          supabaseUrl=${NEXT_PUBLIC_SUPABASE_URL}
+          supabaseKey=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+          EOF
+          ls -la
+
+      # Debug non-verbeux (ne montre pas les valeurs)
       - name: Debug env (mask-safe)
         run: |
-          node -e "console.log('NEXT_PUBLIC_SUPABASE_URL set?', !!process.env.NEXT_PUBLIC_SUPABASE_URL)"
-          node -e "console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY set?', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)"
-          node -e "console.log('supabaseUrl set?', !!process.env.supabaseUrl)"
-          node -e "console.log('supabaseKey set?', !!process.env.supabaseKey)"
-      - run: npm run build --if-present
-      - run: npm run lint --if-present
-      - run: npm run typecheck --if-present
+          node -e "console.log('URL set?', !!process.env.NEXT_PUBLIC_SUPABASE_URL)"
+          node -e "console.log('ANON set?', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)"
+
+      - name: Install (CI)
+        run: npm ci
+
+      - name: Build
+        run: npm run build --if-present
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Typecheck
+        run: npm run typecheck --if-present
